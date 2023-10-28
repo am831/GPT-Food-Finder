@@ -6,6 +6,7 @@ import { getMessages, postChatMessage } from '../services/messages'
 export function ChatPage() {
   const [message, setMessage] = useState('')
   const [messages, setMessages] = useState<Message[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function fetchData() {
@@ -16,7 +17,7 @@ export function ChatPage() {
   }, [])
 
   return (
-    <div className="flex flex-col gap-1 p-5 items-center">
+    <div className="flex flex-col gap-1 p-5 items-center h-screen">
       <div className="p-4 flex flex-col gap-1">
         {messages.map((message) => (
           <ChatBubbles
@@ -26,6 +27,10 @@ export function ChatPage() {
             sender={message.sender}
           ></ChatBubbles>
         ))}
+        {loading &&
+        <div className="chat chat-start">
+          <div className="chat-bubble bg-pink-400 text-white"><span className='loading loading-dots loading-md'></span></div>
+        </div>}
         <form
           className="my-32 flex grow w-11/12 self-center"
           onSubmit={async (event) => {
