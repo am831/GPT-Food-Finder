@@ -6,14 +6,17 @@ from urllib.parse import quote
 
 app = Flask(__name__)
 
-# Get the API key from the environment variable
-yelp_api_key = os.environ.get("YELP_API")
+# yelp_api_key = os.environ.get("YELP_API")
+yelp_api_key = "DtaTtNfJkecLaZD8sZ7fvvhgHi5SdUCDC9xviCLqGzoAzVeE0VHdIGcjU03Tii2Tb5_jm9fbxhvoeot0BUfjh9NNklZyg-eW0pyQ6dClSgVTJKwesoykq2c2uzM9ZXYx"
+print(yelp_api_key)
+openai_api_key = os.environ.get("OPENAI_API")
+print(openai_api_key)
 YELP_HOST = 'https://api.yelp.com'
 SEARCH_PATH = '/v3/businesses/search'
-YELP_SEARCH_LIMIT = 3
+YELP_SEARCH_LIMIT = 20
 headers = {'Authorization': 'Bearer {}'.format(yelp_api_key),'accept': 'application/json'}
 
-@app.route('/test')
+@app.route('/')
 def hello_world():
     return jsonify({"message": "Hello, World!"})
 
@@ -28,11 +31,8 @@ def _request(host, path, api_key, url_params=None):
     headers = {
         'Authorization': 'Bearer %s' % api_key,
     }
-
     print(u'Querying {0} ...'.format(url))
-
     response = requests.request('GET', url, headers=headers, params=url_params)
-
     return response.json()
 
 
@@ -58,9 +58,12 @@ def search():
     'latitude': latitude,
     'longitude': longitude,
     'limit': YELP_SEARCH_LIMIT,
-    'radius': 25 # TODO : get from user
+    'radius': 25 
      }
     return _request(YELP_HOST, SEARCH_PATH, yelp_api_key, url_params)
+
+
+
 
 
 if __name__ == '__main__':
