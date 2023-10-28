@@ -1,6 +1,7 @@
 from flask import Flask, jsonify
 import requests
 from geopy.geocoders import Nominatim
+import geocoder
 
 app = Flask(__name__)
 
@@ -10,11 +11,20 @@ def hello_world():
 
 @app.route('/location')
 def get_user_location():
+    """
     ip_response = requests.get("https://ipinfo.io")
+    
     user_ip = ip_response.json()["ip"]
-    geolocator = Nominatim(user_agent="https://query-csv.streamlit.app/")
-    location = geolocator.geocode(user_ip)
-    return jsonify({"City:": location}, {"ip": user_ip})
+    loc = ip_response.json()["loc"]
+    city = ip_response.json()["city"]
+
+    return jsonify({"ip": user_ip}, {"Coords": loc}, {"city": city})
+    """
+    location = geocoder.ip('me')
+    latitude = location.latlng
+
+    return jsonify({"lat": latitude})
+  
 
 if __name__ == '__main__':
     app.run()
