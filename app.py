@@ -3,6 +3,8 @@ import requests
 from geopy.geocoders import Nominatim
 import os
 from urllib.parse import quote
+import json
+import openai
 
 app = Flask(__name__)
 
@@ -18,6 +20,7 @@ def load_env(file_path='.env'):
 load_env()
 yelp_api_key = os.environ.get("YELP_API")
 openai_api_key = os.environ.get("OPENAI_API")
+openai.api_key = openai_api_key
 YELP_HOST = 'https://api.yelp.com'
 SEARCH_PATH = '/v3/businesses/search'
 YELP_SEARCH_LIMIT = 20
@@ -27,12 +30,12 @@ headers = {'Authorization': 'Bearer {}'.format(yelp_api_key),'accept': 'applicat
 def hello_world():
     return jsonify({"message": "Hello, World!"})
 
-@app.route('/models/location', methods=['GET'])
+@app.route('/models/location', methods=['GET', 'POST'])
 def _get_user_location():
     if request.method == "GET":
         location = request.args.get("latitude", "longitude")
+        print("check", location)
     return location
-    
 
 def _request(host, path, api_key, url_params=None):
     url_params = url_params or {}
@@ -43,7 +46,6 @@ def _request(host, path, api_key, url_params=None):
     print(u'Querying {0} ...'.format(url))
     response = requests.request('GET', url, headers=headers, params=url_params)
     return response.json()
-
 
 @app.route('/business/<business_id_or_alias>')
 def get_by_id(business_id_or_alias):
@@ -58,9 +60,8 @@ def get_by_id(business_id_or_alias):
     business_response = requests.get(business_path, headers=headers)
     return business_response.json()
 
-@app.route('/search')
-def search():
-    coords = _get_user_location()
+def get_restaurant_info():
+    coords = "37.7749,-122.4194"
     latitude, longitude = coords.split(',')
     url_params = {
     'term': "food",
@@ -68,8 +69,55 @@ def search():
     'longitude': longitude,
     'limit': YELP_SEARCH_LIMIT,
     'radius': 25 
-     }
-    return _request(YELP_HOST, SEARCH_PATH, yelp_api_key, url_params)
+    }
+    json_data = _request(YELP_HOST, SEARCH_PATH, yelp_api_key, url_params)
+    restaurants = json_data["businesses"]
+    data = {} # name and cuisine type
+    extra = {} # address and rating
+    for restaurant in restaurants:
+        entry = {}
+        entry2 = {}
+        name = restaurant["name"]
+        categories = restaurant["categories"]
+        category_aliases = [category["title"] for category in categories]
+        id = restaurant["id"]
+        location = restaurant["location"]
+        rating = restaurant["rating"]
+        entry = {"name": name, "categories": category_aliases}
+        entry2 = {"location" : location, "rating" : rating}
+        data[id] = entry
+        extra[id] = entry2
+    data_json = json.dumps(data)
+    extra_json = json.dumps(extra)
+    return data_json, extra_json
+
+
+def chatbot():
+  # Create a list to store all the messages for context
+  messages = []
+
+  # Keep repeating the following
+  while True:
+    # Prompt user for input
+    message = input("User: ")
+    
+    # Exit program if user inputs "quit"
+    if message.lower() == "quit":
+        break
+
+    # Add each new message to the list
+    messages.append({"role": "user", "content": message})
+
+    # Request gpt-3.5-turbo for chat completion
+    response = openai.ChatCompletion.create(
+      model="gpt-3.5-turbo",
+      messages=messages
+    )
+
+    # Print the response and add it to the messages list
+    chat_message = response['choices'][0]['message']['content']
+    print(f"Bot: {chat_message}")
+    messages.append({"role": "assistant", "content": chat_message})
 
 if __name__ == '__main__':
     app.run(debug=True)
