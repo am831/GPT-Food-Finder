@@ -1,11 +1,18 @@
 from flask import Flask, jsonify
 import requests
 from geopy.geocoders import Nominatim
+import os
 
 app = Flask(__name__)
 
-MY_API_KEY = 'Te7DV02erKiHV_V8AWZmX68fHsFPibdC8oPpqvOFt9cJS-cM6unO45-LBEo04BUxKXfWKnaSGrRXs3Nnn1XTKTBQUPYwpuQ5TqGujVfq4nNMdY5NY3qYCselq3A8ZXYx'
-headers = {'Authorization': 'Bearer {}'.format(MY_API_KEY),'accept': 'application/json'}
+with open(".env") as f:
+    for line in f:
+        key, value = line.strip().split("=", 1)
+        os.environ[key] = value
+
+# Get the API key from the environment variable
+yelp_api_key = os.environ.get("YELP_API")
+headers = {'Authorization': 'Bearer {}'.format(yelp_api_key),'accept': 'application/json'}
 
 @app.route('/test')
 def hello_world():
