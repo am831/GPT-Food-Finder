@@ -36,8 +36,7 @@ export function ChatPage() {
               text: message,
               sender: 'self',
             }
-            const res = await postChatMessage(newMsg)
-            setMessages(messages.concat(res))
+            setMessages(messages.concat(newMsg))
           }}
         >
           <input
