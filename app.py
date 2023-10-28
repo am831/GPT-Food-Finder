@@ -55,9 +55,9 @@ def get_by_id(business_id_or_alias):
     business_response = requests.get(business_path, headers=headers)
     return business_response.json()
 
-@app.route('search')
+@app.route('/search')
 def search():
-    coords = _get_user_location()
+    coords, city = _get_user_location()
     url_params = {
     'term': "dinner",
     'location': coords.replace(' ', '+'),
