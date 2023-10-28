@@ -1,27 +1,32 @@
 import axios from 'axios'
 import { UserGeoLocation } from '../models/location'
 
-const baseURL = 'https://localhost:3000/'
+const baseURL = 'http://localhost:3000/'
 
 export function getUserLocation() {
-  const currLocation = { longitude: 0, latitude: 0 }
-  navigator.geolocation.getCurrentPosition(
-    (position) => {
-      currLocation.latitude = position.coords.latitude
-      console.log('Latitude:', position.coords.latitude)
-      currLocation.longitude = position.coords.longitude
-      console.log('Longitude:', position.coords.longitude)
-    },
-    (error) => {
-      console.error(error)
-    }
-  )
-  return currLocation
+  return new Promise((resolve, reject) => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const currLocation = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        }
+        console.log('Latitude:', position.coords.latitude)
+        console.log('Longitude:', position.coords.longitude)
+        resolve(currLocation)
+      },
+      (error) => {
+        console.error(error)
+        reject(error)
+      }
+    )
+  })
 }
 
-export async function postUserLocation(location: UserGeoLocation) {
+export async function postUserLocation() {
   try {
-    const response = await axios.post(baseURL + "models/location", location)
+    const location = await getUserLocation()
+    const response = await axios.post(baseURL, location)
     console.log(response)
   } catch (error) {
     console.error(error)

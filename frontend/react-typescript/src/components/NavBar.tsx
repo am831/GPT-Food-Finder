@@ -1,4 +1,4 @@
-import { getUserLocation } from '../services/location'
+import { getUserLocation, postUserLocation } from '../services/location'
 
 export function NavBar() {
   return (
@@ -27,12 +27,6 @@ export function NavBar() {
               </form>
               <div className="grid grid-cols-1 gap-3">
                 <h3 className="font-bold text-lg">Settings</h3>
-                <div
-                  className="btn bg-green-400 text-white"
-                  onClick={() => getUserLocation}
-                >
-                  Allow access to geolocation
-                </div>
                 <select className="select select-primary w-full max-w-xs">
                   <option disabled selected>
                     Change the default radius
