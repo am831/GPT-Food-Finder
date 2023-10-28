@@ -6,10 +6,18 @@ from urllib.parse import quote
 
 app = Flask(__name__)
 
+def load_env(file_path='.env'):
+    try:
+        with open(file_path, 'r') as file:
+            for line in file:
+                if '=' in line:
+                    key, value = line.strip().split('=', 1)
+                    os.environ[key] = value
+    except FileNotFoundError:
+        print(f"{file_path} not found. Make sure the .env file exists.")
+load_env()
 yelp_api_key = os.environ.get("YELP_API")
-print(yelp_api_key)
 openai_api_key = os.environ.get("OPENAI_API")
-print(openai_api_key)
 YELP_HOST = 'https://api.yelp.com'
 SEARCH_PATH = '/v3/businesses/search'
 YELP_SEARCH_LIMIT = 20
@@ -19,15 +27,15 @@ headers = {'Authorization': 'Bearer {}'.format(yelp_api_key),'accept': 'applicat
 def hello_world():
     return jsonify({"message": "Hello, World!"})
 
-@app.route('models/location', methods=['GET'])
+@app.route('/models/location', methods=['GET'])
 def _get_user_location():
-    location = request.args.get('location')
+    # location = request.args.get('location')
     
-    """
+    
     ip_response = requests.get("https://ipinfo.io")
     loc = ip_response.json()["loc"]
     return loc
-    """
+    
 
 def _request(host, path, api_key, url_params=None):
     url_params = url_params or {}
