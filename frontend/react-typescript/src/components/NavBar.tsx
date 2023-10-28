@@ -1,5 +1,3 @@
-import { getUserLocation, postUserLocation } from '../services/location'
-
 export function NavBar() {
   return (
     <div className="navbar bg-base-100">

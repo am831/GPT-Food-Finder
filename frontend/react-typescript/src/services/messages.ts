@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { Message } from '../models/messages'
+import { Message } from '../models/Message'
 
 const fakeList = [
   {

@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { UserGeoLocation } from '../models/location'
 
 const baseURL = 'http://localhost:3000/'
 
