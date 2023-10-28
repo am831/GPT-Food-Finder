@@ -20,8 +20,7 @@ def hello_world():
 def _get_user_location():
     ip_response = requests.get("https://ipinfo.io")
     loc = ip_response.json()["loc"]
-    city = ip_response.json()["city"]
-    return loc, city
+    return loc
 
 def _request(host, path, api_key, url_params=None):
     url_params = url_params or {}
@@ -52,24 +51,17 @@ def get_by_id(business_id_or_alias):
 
 @app.route('/search')
 def search():
-    coords, city = _get_user_location()
+    coords = _get_user_location()
+    latitude, longitude = coords.split(',')
     url_params = {
-    'term': "dinner",
-    'location': coords.replace(' ', '+'),
-    'limit': YELP_SEARCH_LIMIT
-    }
+    'term': "food",
+    'latitude': latitude,
+    'longitude': longitude,
+    'limit': YELP_SEARCH_LIMIT,
+    'radius': 25 # TODO : get from user
+     }
     return _request(YELP_HOST, SEARCH_PATH, yelp_api_key, url_params)
 
-# @app.route('/business/search/<phone>')
-# def get_business_location(phone):
-#     """ Getting business location from phone number
-#         could have multiple location returned 
-#     Arg:
-#         phone(str): It must start with + and include the country code, like +14159083801.
-#     """
-#     # headers = {'Authorization': 'Bearer {}'.format(MY_API_KEY),'accept': 'application/json'}
-#     business_path = 'https://api.yelp.com/v3/businesses/search/phone'
-#     business_response = requests.get(business_path, headers=headers)
-#     return business_response.json()
+
 if __name__ == '__main__':
     app.run(debug=True)
