@@ -27,14 +27,13 @@ headers = {'Authorization': 'Bearer {}'.format(yelp_api_key),'accept': 'applicat
 def hello_world():
     return jsonify({"message": "Hello, World!"})
 
-@app.route('/models/location', methods=['GET'])
+@app.route('/models/location', methods=['POST'])
 def _get_user_location():
-    # location = request.args.get('location')
-    
-    
-    ip_response = requests.get("https://ipinfo.io")
-    loc = ip_response.json()["loc"]
-    return loc
+    data = request.get_json()
+    if 'latitude' in data and 'longitude' in data:
+        latitude = data['latitude']
+        longitude = data['longitude']
+    return latitude, longitude
     
 
 def _request(host, path, api_key, url_params=None):
