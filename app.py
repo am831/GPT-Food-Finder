@@ -6,8 +6,7 @@ from urllib.parse import quote
 
 app = Flask(__name__)
 
-# yelp_api_key = os.environ.get("YELP_API")
-yelp_api_key = "DtaTtNfJkecLaZD8sZ7fvvhgHi5SdUCDC9xviCLqGzoAzVeE0VHdIGcjU03Tii2Tb5_jm9fbxhvoeot0BUfjh9NNklZyg-eW0pyQ6dClSgVTJKwesoykq2c2uzM9ZXYx"
+yelp_api_key = os.environ.get("YELP_API")
 print(yelp_api_key)
 openai_api_key = os.environ.get("OPENAI_API")
 print(openai_api_key)
@@ -23,7 +22,8 @@ def hello_world():
 def _get_user_location():
     ip_response = requests.get("https://ipinfo.io")
     loc = ip_response.json()["loc"]
-    return loc
+    city = ip_response.json()["city"]
+    return loc, city
 
 def _request(host, path, api_key, url_params=None):
     url_params = url_params or {}
@@ -42,7 +42,7 @@ def get_by_id(business_id_or_alias):
     Arg:
         business_id_or_alias(str): The business alias (i.e. yelp-san-francisco) or
                 ID (i.e. 4kMBvIEWPxWkWKFN__8SxQ.
-    
+
     """
     # headers = {'Authorization': 'Bearer {}'.format(MY_API_KEY),'accept': 'application/json'}
     business_path = f'https://api.yelp.com/v3/businesses/{business_id_or_alias}'
@@ -51,8 +51,7 @@ def get_by_id(business_id_or_alias):
 
 @app.route('/search')
 def search():
-    coords = _get_user_location()
-    latitude, longitude = coords.split(',')
+    coords, city = _get_user_location()
     url_params = {
     'term': "food",
     'latitude': latitude,
