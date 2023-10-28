@@ -30,9 +30,8 @@ def hello_world():
 @app.route('/models/location', methods=['GET'])
 def _get_user_location():
     if request.method == "GET":
-        location = request.args.get("location")
-      
-    return location.latitude, location.longitude
+        location = request.args.get("latitude", "longitude")
+    return location
     
 
 def _request(host, path, api_key, url_params=None):
