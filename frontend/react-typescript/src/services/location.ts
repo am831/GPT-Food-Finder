@@ -1,6 +1,5 @@
 import axios from "axios";
-import { Message } from "../components/ChatBubble";
-
+import { Message } from "discord.js";
 export async function postMessage () {
-  
+
 }

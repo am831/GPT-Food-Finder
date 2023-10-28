@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Message } from './ChatBubble'
 import { ChatBubbles } from './ChatBubble'
+import { Message } from '../models/messages'
 
 type MessageList = {
   list: Message[]

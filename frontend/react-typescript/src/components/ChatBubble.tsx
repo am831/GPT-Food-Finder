@@ -1,7 +1,4 @@
-export type Message = {
-  date: number
-  text: string
-}
+import { Message } from "../models/messages"
 
 export function ChatBubbles(message: Message) {
   return (
