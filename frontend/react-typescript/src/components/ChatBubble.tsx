@@ -1,7 +1,23 @@
-import { Message } from "../models/messages"
+import { Message } from '../models/messages'
 
-export function ChatBubbles(message: Message) {
+type ChatBubbleProps = {
+  text: string,
+  date: number,
+  sender: string
+}
+
+export function ChatBubbles({ text, date, sender }: ChatBubbleProps) {
   return (
-    <div className="chat-bubble">{message.text}</div>
+    <div className="md: w-screen">
+      {sender !== 'self' ? (
+        <div className="chat chat-start">
+          <div className="chat-bubble bg-pink-400 text-white">{text}</div>
+        </div>
+      ) : (
+        <div className="chat chat-end">
+          <div className="chat-bubble bg-purple-400 text-white">{text}</div>
+        </div>
+      )}
+    </div>
   )
 }
