@@ -3,6 +3,8 @@ import requests
 from geopy.geocoders import Nominatim
 import os
 from urllib.parse import quote
+import json
+import openai
 
 app = Flask(__name__)
 
@@ -18,6 +20,7 @@ def load_env(file_path='.env'):
 load_env()
 yelp_api_key = os.environ.get("YELP_API")
 openai_api_key = os.environ.get("OPENAI_API")
+openai.api_key = openai_api_key
 YELP_HOST = 'https://api.yelp.com'
 SEARCH_PATH = '/v3/businesses/search'
 YELP_SEARCH_LIMIT = 20
@@ -33,12 +36,6 @@ def _get_user_location():
         location = request.args.get("latitude", "longitude")
         print("check", location)
     return location
-
-def get_user_location():
-    ip_response = requests.get("https://ipinfo.io")
-    loc = ip_response.json()["loc"]
-    print("check", loc)
-    return loc
 
 def _request(host, path, api_key, url_params=None):
     url_params = url_params or {}
@@ -63,9 +60,8 @@ def get_by_id(business_id_or_alias):
     business_response = requests.get(business_path, headers=headers)
     return business_response.json()
 
-@app.route('/search')
-def search():
-    coords = get_user_location()
+def get_restaurant_info():
+    coords = "37.7749,-122.4194"
     latitude, longitude = coords.split(',')
     url_params = {
     'term': "food",
@@ -74,7 +70,27 @@ def search():
     'limit': YELP_SEARCH_LIMIT,
     'radius': 25 
     }
-    return _request(YELP_HOST, SEARCH_PATH, yelp_api_key, url_params)
+    json_data = _request(YELP_HOST, SEARCH_PATH, yelp_api_key, url_params)
+    restaurants = json_data["businesses"]
+    data = {} # name and cuisine type
+    extra = {} # address and rating
+    for restaurant in restaurants:
+        entry = {}
+        entry2 = {}
+        name = restaurant["name"]
+        categories = restaurant["categories"]
+        category_aliases = [category["title"] for category in categories]
+        id = restaurant["id"]
+        location = restaurant["location"]
+        rating = restaurant["rating"]
+        entry = {"name": name, "categories": category_aliases}
+        entry2 = {"location" : location, "rating" : rating}
+        data[id] = entry
+        extra[id] = entry2
+    data_json = json.dumps(data)
+    extra_json = json.dumps(extra)
+    return data_json, extra_json
+
 
 def chatbot():
   # Create a list to store all the messages for context
