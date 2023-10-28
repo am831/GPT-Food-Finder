@@ -84,7 +84,6 @@ def chatbot():
   while True:
     # Prompt user for input
     message = input("User: ")
-
     # Exit program if user inputs "quit"
     if message.lower() == "quit":
         break
