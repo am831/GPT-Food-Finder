@@ -4,6 +4,7 @@ from geopy.geocoders import Nominatim
 import os
 from urllib.parse import quote
 import json
+import openai
 
 app = Flask(__name__)
 
@@ -19,6 +20,7 @@ def load_env(file_path='.env'):
 load_env()
 yelp_api_key = os.environ.get("YELP_API")
 openai_api_key = os.environ.get("OPENAI_API")
+openai.api_key = openai_api_key
 YELP_HOST = 'https://api.yelp.com'
 SEARCH_PATH = '/v3/businesses/search'
 YELP_SEARCH_LIMIT = 20
@@ -58,8 +60,7 @@ def get_by_id(business_id_or_alias):
     business_response = requests.get(business_path, headers=headers)
     return business_response.json()
 
-@app.route('/search')
-def search():
+def get_restaurant_info():
     coords = "37.7749,-122.4194"
     latitude, longitude = coords.split(',')
     url_params = {
@@ -89,6 +90,7 @@ def search():
     data_json = json.dumps(data)
     extra_json = json.dumps(extra)
     return data_json, extra_json
+
 
 if __name__ == '__main__':
     app.run(debug=True)
