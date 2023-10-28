@@ -27,12 +27,18 @@ headers = {'Authorization': 'Bearer {}'.format(yelp_api_key),'accept': 'applicat
 def hello_world():
     return jsonify({"message": "Hello, World!"})
 
-@app.route('/models/location', methods=['GET'])
+@app.route('/models/location', methods=['GET', 'POST'])
 def _get_user_location():
     if request.method == "GET":
         location = request.args.get("latitude", "longitude")
+        print("check", location)
     return location
-    
+
+def get_user_location():
+    ip_response = requests.get("https://ipinfo.io")
+    loc = ip_response.json()["loc"]
+    print("check", loc)
+    return loc
 
 def _request(host, path, api_key, url_params=None):
     url_params = url_params or {}
@@ -43,7 +49,6 @@ def _request(host, path, api_key, url_params=None):
     print(u'Querying {0} ...'.format(url))
     response = requests.request('GET', url, headers=headers, params=url_params)
     return response.json()
-
 
 @app.route('/business/<business_id_or_alias>')
 def get_by_id(business_id_or_alias):
@@ -60,7 +65,7 @@ def get_by_id(business_id_or_alias):
 
 @app.route('/search')
 def search():
-    coords = _get_user_location()
+    coords = get_user_location()
     latitude, longitude = coords.split(',')
     url_params = {
     'term': "food",
@@ -68,7 +73,7 @@ def search():
     'longitude': longitude,
     'limit': YELP_SEARCH_LIMIT,
     'radius': 25 
-     }
+    }
     return _request(YELP_HOST, SEARCH_PATH, yelp_api_key, url_params)
 
 if __name__ == '__main__':
