@@ -51,7 +51,8 @@ def get_by_id(business_id_or_alias):
 
 @app.route('/search')
 def search():
-    coords, city = _get_user_location()
+    coords = _get_user_location()
+    latitude, longitude = coords[0].split(',')[0]
     url_params = {
     'term': "food",
     'latitude': latitude,
