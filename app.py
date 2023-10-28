@@ -27,13 +27,12 @@ headers = {'Authorization': 'Bearer {}'.format(yelp_api_key),'accept': 'applicat
 def hello_world():
     return jsonify({"message": "Hello, World!"})
 
-@app.route('/models/location', methods=['POST'])
+@app.route('/models/location', methods=['GET'])
 def _get_user_location():
-    data = request.get_json()
-    if 'latitude' in data and 'longitude' in data:
-        latitude = data['latitude']
-        longitude = data['longitude']
-    return latitude, longitude
+    if request.method == "GET":
+        location = request.args.get("location")
+      
+    return location.latitude, location.longitude
     
 
 def _request(host, path, api_key, url_params=None):

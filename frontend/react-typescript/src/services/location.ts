@@ -16,13 +16,13 @@ export function getUserLocation() {
       console.error(error)
     }
   )
-
   return currLocation
 }
 
 export async function postUserLocation(location: UserGeoLocation) {
   try {
-    const response = await axios.post(baseURL, location)
+    const response = await axios.post(baseURL + "models/location", location)
+    console.log(response)
   } catch (error) {
     console.error(error)
   }
