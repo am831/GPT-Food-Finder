@@ -11,6 +11,7 @@ import time
 import uuid
 from fastapi.templating import Jinja2Templates
 import geocoder
+from fastapi.staticfiles import StaticFiles
 
 
 app = FastAPI()
@@ -40,7 +41,7 @@ openai_api_key = os.environ.get("OPENAI_API")
 YELP_HOST = 'https://api.yelp.com'
 SEARCH_PATH = '/v3/businesses/search'
 YELP_SEARCH_LIMIT = 20
-templates = Jinja2Templates(directory="templates")
+app.mount("/fontend/react-typescript", StaticFiles(directory="frontend/react-typescript"), name="index.html")
 
 class Location(BaseModel):
     latitude: float
@@ -102,9 +103,9 @@ messages.append({"role": "user", "content": "Here is extra info about restaurant
 
 @app.get("/", response_class=HTMLResponse)
 async def render_html(request: Request):
-    template_data = {"title": "My FastAPI Page", "content": "This is a FastAPI-rendered HTML page."}
-    # get_location()
-    return templates.TemplateResponse("index.html", {"request": request, "context": template_data})
+    with open("frontend/dist/index.html", "r") as f:
+        html_content = f.read()
+    return HTMLResponse(content=html_content)
 
 @app.post("/location")
 def init(location: Location):
