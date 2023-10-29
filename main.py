@@ -10,6 +10,7 @@ import openai
 import time
 import uuid
 from fastapi.templating import Jinja2Templates
+import geocoder
 
 
 app = FastAPI()
@@ -90,22 +91,37 @@ def get_restaurant_info(latitude, longitude):
     extra_json = json.dumps(extra)
     return data_json, extra_json
 
+location = geocoder.ip('me')
+latitude, longitude = location.latlng[0], location.latlng[1]
+data, extra_info = get_restaurant_info(latitude, longitude)
+data_string = json.dumps(data)
+messages.append({"role": "system", "content": "You are a professional restaurant reviewer and reocmmender."})
+messages.append({"role": "system", "content": "The user is located in San Francisco."})
+messages.append({"role": "user", "content": "Here is data about restaurants in JSON format. Use this data to answer my questions. " + data_string})
+messages.append({"role": "user", "content": "Here is extra info about restaurants in JSON format. Use this data to answer my questions. " + extra_info})
+
 @app.get("/", response_class=HTMLResponse)
 async def render_html(request: Request):
     template_data = {"title": "My FastAPI Page", "content": "This is a FastAPI-rendered HTML page."}
+    # get_location()
     return templates.TemplateResponse("index.html", {"request": request, "context": template_data})
 
 @app.post("/location")
 def init(location: Location):
-    latitude, longitude = location.latitude, location.longitude
+    """
+    location = geocoder.ip('me')
+    latitude, longitude = location.latlng.split(',')
     data, extra_info = get_restaurant_info(latitude, longitude)
     data_string = json.dumps(data)
     messages.append({"role": "user", "content": "Here is data about restaurants in JSON format. Use this data to answer my questions. " + data_string})
     messages.append({"role": "user", "content": "Here is extra info about restaurants in JSON format. Use this data to answer my questions. " + extra_info})
+    """
+
     return {"success": True}
 
 @app.post("/messages/")
 def message_sent(data: UserMessage):
+    
     user_message = data.text
     messages.append({"role": "user", "content": user_message})
     response = _send_chat_request()
