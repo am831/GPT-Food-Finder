@@ -68,7 +68,6 @@ def get_by_id(business_id_or_alias):
 @app.route('/search')
 def get_restaurant_info():
     location = _get_user_location()
-    print("locaiton", location)
     coords = "37.7749,-122.4194"
     latitude, longitude = coords.split(',')
     url_params = {
@@ -106,48 +105,22 @@ def get_restaurant_info():
 def chatbot():
     #TODO: Keeping track of user's content/response into messages
     # Create a list to store all the messages for context
+    data, extra_info = get_restaurant_info()
+    data_string = json.dumps(data)
+    print(data_string)
     messages = [
-            {"role": "user", "content": "What is the nearest Indian restaurant?"},
-            {"role": "user", "content": "Show me restaurant with vegan option"}
+            {"role": "user", "content": "Here is data about restaurants in JSON format. Use this data to answer my questions. " + data_string}, 
+            {"role": "user", "content": "Show me restaurant with ice cream"}
             ]
-    while True:
-        # user_response = message.content
-        # # Exit program if user inputs "quit"
-        # if user_response == "quit":
-        #     break
-
-        # messages.append({"role": "user", "content": user_response})
-
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo-0613",
-            messages=messages,
-            # max_tokens = 1024, # this is the maximum number of tokens that can be used to provide a response.
-        )
-        chat_message = response['choices'][0]['message']['content']
-        print(f"Bot: {chat_message}")
-        messages.append({"role": "user", "content": chat_message})
-
-        ''' Example of chat completion object 
-        {
-            "id": "chatcmpl-123",
-            "object": "chat.completion",
-            "created": 1677652288,
-            "model": "gpt-3.5-turbo-0613",
-            "choices": [{
-                "index": 0,
-                "message": {
-                "role": "assistant",
-                "content": "\n\nHello there, how may I assist you today?",
-                },
-                "finish_reason": "stop"
-            }],
-            "usage": {
-                "prompt_tokens": 9,
-                "completion_tokens": 12,
-                "total_tokens": 21
-            }
-        }
-        '''
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo-0613",
+        messages=messages,
+        # max_tokens = 1024, # this is the maximum number of tokens that can be used to provide a response.
+    )
+    chat_message = response['choices'][0]['message']['content']
+    print(f"Bot: {chat_message}")
+    messages.append({"role": "user", "content": chat_message})
+    return chat_message
 
 if __name__ == '__main__':
     app.run(debug=True)
