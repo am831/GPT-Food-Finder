@@ -56,13 +56,6 @@ def _get_user_location():
     return latitude, longitude
 """
 
-def get_location():
-    ip_response = requests.get("https://ipinfo.io")
-
-    user_ip = ip_response.json()["ip"]
-    pass
-    
-
 def _request(host, path, api_key, url_params=None):
     url_params = url_params or {}
     url = '{0}{1}'.format(host, quote(path.encode('utf8')))
