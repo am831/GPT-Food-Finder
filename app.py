@@ -33,7 +33,6 @@ def load_env(file_path='.env'):
 load_env()
 yelp_api_key = os.environ.get("YELP_API")
 openai_api_key = os.environ.get("OPENAI_API")
-openai.api_key = openai_api_key
 YELP_HOST = 'https://api.yelp.com'
 SEARCH_PATH = '/v3/businesses/search'
 YELP_SEARCH_LIMIT = 20
@@ -101,7 +100,7 @@ def message_sent(data: UserMessage):
     user_message = data.text
     messages.append({"role": "user", "content": user_message})
     response = _send_chat_request()
-    messages.append({"role": "assistant", "content": response})
+    messages.append({"role": "assistant", "content": response['choices'][0]['message']['content']})
     unique_id = abs(hash(uuid.uuid4()))
     message_dto = {
         "id": unique_id,
@@ -116,6 +115,7 @@ def _send_chat_request():
     Helper function that handles the chat request to the OpenAI API.
     '''
     response = ""
+    openai.api_key = openai_api_key
     try:
         response: Any = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
