@@ -75,7 +75,6 @@ def get_restaurant_info(latitude, longitude):
     'radius': 25 
     }
     json_data = _request(YELP_HOST, SEARCH_PATH, yelp_api_key, url_params)
-    #print(json_data)
     restaurants = json_data["businesses"]
     data = {} # name and cuisine type
     extra = {} # address and rating
@@ -102,13 +101,13 @@ async def message_sent():
     if request.method == "GET":
         pass
     elif request.method == "POST":
-        
         data = request.get_json()
         if data is None:
             return jsonify(error="Invalid JSON"), 400
         user_message = data.get("text")
         messages.append({"role": "user", "content": user_message})
         response = await _send_chat_request(user_message)
+        messages.append({"role": "user", "content": response})
         message_dto = {
             "date": int(time.time() * 1000),
             "text": response['choices'][0]['message']['content'],
