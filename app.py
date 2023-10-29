@@ -30,12 +30,17 @@ headers = {'Authorization': 'Bearer {}'.format(yelp_api_key),'accept': 'applicat
 def hello_world():
     return jsonify({"message": "Hello, World!"})
 
-@app.route('/models/location', methods=['GET', 'POST'])
+@app.route('/models/location', methods=['POST', 'GET'])
 def _get_user_location():
-    if request.method == "GET":
-        location = request.args.get("latitude", "longitude")
-        print("check", location)
-    return location
+    if request.method == "POST":
+        location = request.get_json()
+        print("check1", location)
+        return location
+    elif request.method == "GET":
+        location = request.args.get('latitude', 'longitude')
+        print("check2", location)
+        return location
+    return {"message": "Hello, World!"}
 
 def _request(host, path, api_key, url_params=None):
     url_params = url_params or {}
@@ -60,7 +65,10 @@ def get_by_id(business_id_or_alias):
     business_response = requests.get(business_path, headers=headers)
     return business_response.json()
 
+@app.route('/search')
 def get_restaurant_info():
+    location = _get_user_location()
+    print("locaiton", location)
     coords = "37.7749,-122.4194"
     latitude, longitude = coords.split(',')
     url_params = {
@@ -91,33 +99,43 @@ def get_restaurant_info():
     extra_json = json.dumps(extra)
     return data_json, extra_json
 
+if __name__ == '__main__':
+    app.run(debug=True)
 
+
+@app.route('/chat', methods=['POST'])
 def chatbot():
   # Create a list to store all the messages for context
   messages = []
 
-  # Keep repeating the following
-  while True:
-    # Prompt user for input
-    message = input("User: ")
-    
-    # Exit program if user inputs "quit"
-    if message.lower() == "quit":
-        break
+  if request.method == 'POST':
+    user_req = request.args.get('user_req')
 
-    # Add each new message to the list
-    messages.append({"role": "user", "content": message})
+    # Keep repeating the following
+    while True:
+        # Prompt user for input
+        message = input("User: ")
+        
+        # Exit program if user inputs "quit"
+        if message.lower() == "quit":
+            break
 
-    # Request gpt-3.5-turbo for chat completion
-    response = openai.ChatCompletion.create(
-      model="gpt-3.5-turbo",
-      messages=messages
-    )
+        # Add each new message to the list
+        messages.append({"role": "user", "content": message})
 
-    # Print the response and add it to the messages list
-    chat_message = response['choices'][0]['message']['content']
-    print(f"Bot: {chat_message}")
-    messages.append({"role": "assistant", "content": chat_message})
+        # Request gpt-3.5-turbo for chat completion
+        response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=messages
+        )
+
+        # Print the response and add it to the messages list
+        chat_message = response['choices'][0]['message']['content']
+        print(f"Bot: {chat_message}")
+        messages.append({"role": "assistant", "content": chat_message})
+  
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
