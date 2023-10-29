@@ -39,10 +39,9 @@ def init():
     response.headers.add("Access-Control-Allow-Origin", "*")
     data, extra_info = get_restaurant_info(latitude, longitude)
     data_string = json.dumps(data)
-    messages.append({"role": "user", "content": "Here is data about restaurants in JSON format. Use this data to answer my questions. " + data_string}, 
-            {"role": "user", "content": "Here is extra info about restaurants in JSON format. Use this data to answer my questions. " + extra_info})
-    print("messages", messages)
-    return jsonify({"message": "Hello, World!"})
+    messages.append({"role": "user", "content": "Here is data about restaurants in JSON format. Use this data to answer my questions. " + data_string})
+    messages.append({"role": "user", "content": "Here is extra info about restaurants in JSON format. Use this data to answer my questions. " + extra_info})
+    return jsonify(messages)
 
 """
 @app.route('/location', methods=['POST', 'GET'])
@@ -56,6 +55,13 @@ def _get_user_location():
     print("check", latitude, longitude)
     return latitude, longitude
 """
+
+def get_location():
+    ip_response = requests.get("https://ipinfo.io")
+
+    user_ip = ip_response.json()["ip"]
+    pass
+    
 
 def _request(host, path, api_key, url_params=None):
     url_params = url_params or {}
@@ -76,7 +82,7 @@ def get_restaurant_info(latitude, longitude):
     'radius': 25 
     }
     json_data = _request(YELP_HOST, SEARCH_PATH, yelp_api_key, url_params)
-    print(json_data)
+    #print(json_data)
     restaurants = json_data["businesses"]
     data = {} # name and cuisine type
     extra = {} # address and rating
