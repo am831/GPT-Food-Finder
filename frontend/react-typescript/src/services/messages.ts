@@ -5,10 +5,10 @@ const fakeList = [
   {
     id: 1,
     date: 1,
-    text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-    sender: 'self',
+    text: "Hi 👋! Thanks for trying our app. What kind of food would you like today?",
+    sender: 'bot',
   },
-  { id: 2, date: 1, text: 'hello world', sender: 'self' },
+  { id: 2, date: 1, text: 'I\'d like to order a slice of pizza', sender: 'self' },
   { id: 3, date: 1, text: 'hello world', sender: 'self' },
   { id: 4, date: 1, text: 'hello world', sender: 'self' },
   { id: 5, date: 1, text: 'hello world', sender: 'bot' },
