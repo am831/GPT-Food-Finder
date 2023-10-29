@@ -106,7 +106,7 @@ async def message_sent():
             return jsonify(error="Invalid JSON"), 400
         user_message = data.get("text")
         messages.append({"role": "user", "content": user_message})
-        response = await _send_chat_request(user_message)
+        response = await _send_chat_request()
         messages.append({"role": "assistant", "content": response})
         message_dto = {
             "date": int(time.time() * 1000),
@@ -116,7 +116,7 @@ async def message_sent():
         return jsonify(message_dto)
 
 
-async def _send_chat_request(prompt):
+async def _send_chat_request():
     '''
     Helper function that handles the chat request to the OpenAI API.
     '''
@@ -125,7 +125,7 @@ async def _send_chat_request(prompt):
     try:
         response: Any = await openai.ChatCompletion.acreate(
             model= "gpt-3.5-turbo",
-            messages= prompt,
+            messages= messages,
         )
     except Exception as exception:
         raise OpenAIServiceError (
