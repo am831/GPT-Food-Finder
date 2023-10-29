@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { UserGeoLocation } from '../models/location'
 
 const baseURL = 'http://localhost:5000/'
 
@@ -21,7 +20,7 @@ export function getUserLocation() {
       },
       {
         enableHighAccuracy: false,
-        timeout: 5000,
+        timeout: 10000,
         maximumAge: Infinity,
       }
     )
@@ -31,7 +30,7 @@ export function getUserLocation() {
 export async function postUserLocation() {
   try {
     const location = getUserLocation()
-    const response = await axios.post(baseURL, location)
+    const response = await axios.post(baseURL + 'location/', location)
     console.log(response)
   } catch (error) {
     console.error(error)
