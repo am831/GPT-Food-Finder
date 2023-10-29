@@ -1,12 +1,9 @@
-import { Message } from '../models/messages'
-
 type ChatBubbleProps = {
   text: string
-  date: number
   sender: string
 }
 
-export function ChatBubbles({ text, date, sender }: ChatBubbleProps) {
+export function ChatBubbles({ text, sender }: ChatBubbleProps) {
   return (
     <div className=''>
       {sender !== 'self' ? (

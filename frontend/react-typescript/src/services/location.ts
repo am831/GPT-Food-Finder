@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const baseURL = 'http://localhost:8000/'
+const baseURL = 'http://localhost:8000/location/'
 
 export function getUserLocation() {
   return new Promise((resolve, reject) => {
@@ -28,9 +28,9 @@ export function getUserLocation() {
 }
 
 export async function postUserLocation() {
+  const location = getUserLocation()
   try {
-    const location = getUserLocation()
-    const response = await axios.post(baseURL + 'location/', location)
+    const response = await axios.post(baseURL, location)
     console.log(response)
   } catch (error) {
     console.error(error)

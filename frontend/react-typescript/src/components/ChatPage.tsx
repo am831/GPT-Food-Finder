@@ -22,7 +22,6 @@ export function ChatPage() {
         {messages.map((message) => (
           <ChatBubbles
             key={message.id}
-            date={message.date}
             text={message.text}
             sender={message.sender}
           ></ChatBubbles>
