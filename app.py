@@ -110,7 +110,7 @@ async def message_sent():
         messages.append({"role": "user", "content": user_message})
         response = await _send_chat_request()
         messages.append({"role": "assistant", "content": response})
-        unique_id = str(uuid.uuid4())
+        unique_id = abs(hash(uuid.uuid4()))
         message_dto = {
             "id": unique_id,
             "date": int(time.time() * 1000),
