@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { Message } from '../models/messages'
 
-const baseAddress = 'http://localhost:5000/messages/'
+const baseAddress = 'http://localhost:8000/messages/'
 const fakeList = [
   {
     id: 1,

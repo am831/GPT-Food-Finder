@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const baseURL = 'http://localhost:5000/'
+const baseURL = 'http://localhost:8000/'
 
 export function getUserLocation() {
   return new Promise((resolve, reject) => {
