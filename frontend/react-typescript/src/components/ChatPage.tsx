@@ -17,8 +17,8 @@ export function ChatPage() {
   }, [])
 
   return (
-    <div className="flex flex-col gap-1 p-5 items-center h-screen">
-      <div className="p-4 flex flex-col gap-1">
+    <div className='flex flex-col gap-1 items-center h-5/6 overflow-hidden'>
+      <div className='grid grid-cols-1 gap-1 my-10'>
         {messages.map((message) => (
           <ChatBubbles
             key={message.id}
@@ -27,12 +27,15 @@ export function ChatPage() {
             sender={message.sender}
           ></ChatBubbles>
         ))}
-        {loading &&
-        <div className="chat chat-start">
-          <div className="chat-bubble bg-pink-400 text-white"><span className='loading loading-dots loading-md'></span></div>
-        </div>}
+        {loading && (
+          <div className='chat chat-start'>
+            <div className='chat-bubble bg-pink-400 text-white'>
+              <span className='loading loading-dots loading-md'></span>
+            </div>
+          </div>
+        )}
         <form
-          className="my-32 flex grow w-11/12 self-center"
+          className='my-32 flex grow self-center'
           onSubmit={async (event) => {
             event.preventDefault()
             const newMsg = {
@@ -41,18 +44,19 @@ export function ChatPage() {
               text: message,
               sender: 'self',
             }
-            setMessages(messages.concat(newMsg))
+            const responseMsg = await postChatMessage(newMsg)
+            setMessages([...messages, newMsg, responseMsg])
           }}
         >
           <input
-            className="input input-bordered w-full"
-            type="text"
-            placeholder="Enter your text here..."
+            className='input input-bordered w-full'
+            type='text'
+            placeholder='Enter your text here...'
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               setMessage(event.target.value)
             }}
           />
-          <button className="btn" type="submit">
+          <button className='btn' type='submit'>
             Send
           </button>
         </form>

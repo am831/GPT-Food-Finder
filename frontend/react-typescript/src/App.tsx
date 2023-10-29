@@ -10,10 +10,9 @@ function App() {
   }, [])
 
   return (
-    <div className='flex flex-col'>
+    <div className='flex flex-col overflow-hidden'>
       <NavBar></NavBar>
       {loggedIn && <ChatPage></ChatPage>}
-      <button onClick={() => postUserLocation}>text</button>
     </div>
   )
 }
