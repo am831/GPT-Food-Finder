@@ -6,6 +6,7 @@ Our tech stack is fastAPI back end and react front end. We used Yelp API to get 
 
 ## How to Use
 - clone the project
+- Get a free openAI and YelpFusion API keys
 Run frontend server:
 - cd frontend/react-typescript
 - npm install
