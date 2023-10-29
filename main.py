@@ -1,4 +1,5 @@
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, Request
+from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Any, List
@@ -8,6 +9,8 @@ import json
 import openai
 import time
 import uuid
+from fastapi.templating import Jinja2Templates
+
 
 app = FastAPI()
 
@@ -36,6 +39,7 @@ openai_api_key = os.environ.get("OPENAI_API")
 YELP_HOST = 'https://api.yelp.com'
 SEARCH_PATH = '/v3/businesses/search'
 YELP_SEARCH_LIMIT = 20
+templates = Jinja2Templates(directory="templates")
 
 class Location(BaseModel):
     latitude: float
@@ -86,7 +90,11 @@ def get_restaurant_info(latitude, longitude):
     extra_json = json.dumps(extra)
     return data_json, extra_json
 
-@app.post("/")
+@app.get("/", response_class=HTMLResponse)
+async def render_html(request: Request):
+    return templates.TemplateResponse("index.html")
+
+@app.post("/location")
 def init(location: Location):
     latitude, longitude = location.latitude, location.longitude
     data, extra_info = get_restaurant_info(latitude, longitude)
