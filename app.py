@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 import requests
 import os
 from urllib.parse import quote
@@ -10,6 +10,7 @@ import time
 
 app = Flask(__name__)
 CORS(app)
+app.config['index.html'] = True
 
 def load_env(file_path='.env'):
     try:
@@ -41,7 +42,7 @@ def init():
     data_string = json.dumps(data)
     messages.append({"role": "user", "content": "Here is data about restaurants in JSON format. Use this data to answer my questions. " + data_string})
     messages.append({"role": "user", "content": "Here is extra info about restaurants in JSON format. Use this data to answer my questions. " + extra_info})
-    return jsonify(messages)
+    return render_template('index.html')
 
 """
 @app.route('/location', methods=['POST', 'GET'])
@@ -114,7 +115,6 @@ async def message_sent():
             "sender": "bot",
         }
         return jsonify(message_dto)
-
 
 async def _send_chat_request():
     '''
