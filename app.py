@@ -88,7 +88,7 @@ def get_restaurant_info(latitude, longitude):
     return data_json, extra_json
 
 @app.post("/")
-async def init(location: Location):
+def init(location: Location):
     latitude, longitude = location.latitude, location.longitude
     data, extra_info = get_restaurant_info(latitude, longitude)
     data_string = json.dumps(data)
@@ -97,10 +97,10 @@ async def init(location: Location):
     return {"success": True}
 
 @app.post("/messages/")
-async def message_sent(data: UserMessage):
+def message_sent(data: UserMessage):
     user_message = data.text
     messages.append({"role": "user", "content": user_message})
-    response = await _send_chat_request()
+    response = _send_chat_request()
     messages.append({"role": "assistant", "content": response})
     unique_id = abs(hash(uuid.uuid4()))
     message_dto = {
@@ -111,13 +111,13 @@ async def message_sent(data: UserMessage):
     }
     return message_dto
 
-async def _send_chat_request():
+def _send_chat_request():
     '''
     Helper function that handles the chat request to the OpenAI API.
     '''
     response = ""
     try:
-        response: Any = await openai.ChatCompletion.create(
+        response: Any = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=messages,
         )
