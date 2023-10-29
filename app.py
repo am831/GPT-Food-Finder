@@ -122,13 +122,10 @@ async def _send_chat_request(prompt):
     '''
     response = ""
     openai.api_key = openai_api_key
-    formatted_message = [
-            {"role": "user", "content": prompt}
-    ]
     try:
         response: Any = await openai.ChatCompletion.acreate(
             model= "gpt-3.5-turbo",
-            messages= formatted_message,
+            messages= prompt,
         )
     except Exception as exception:
         raise OpenAIServiceError (
