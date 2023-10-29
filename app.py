@@ -107,7 +107,7 @@ async def message_sent():
         user_message = data.get("text")
         messages.append({"role": "user", "content": user_message})
         response = await _send_chat_request(user_message)
-        messages.append({"role": "user", "content": response})
+        messages.append({"role": "assistant", "content": response})
         message_dto = {
             "date": int(time.time() * 1000),
             "text": response['choices'][0]['message']['content'],
