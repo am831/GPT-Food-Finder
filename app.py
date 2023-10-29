@@ -5,8 +5,10 @@ import os
 from urllib.parse import quote
 import json
 import openai
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 def load_env(file_path='.env'):
     try:
@@ -33,15 +35,13 @@ def hello_world():
 
 @app.route('/models/location', methods=['POST', 'GET'])
 def _get_user_location():
-    if request.method == "POST":
-        location = request.get_json()
-        print("check1", location)
-        return location
-    elif request.method == "GET":
-        location = request.args.get('latitude', 'longitude')
-        print("check2", location)
-        return location
-    return {"message": "Hello, World!"}
+    location = request.get_json()
+    if location is None:
+        return jsonify(error='Invalid JSON'), 400
+    latitude, longitude = location.get('latitude'), location.get('longitude')
+    response = jsonify(success=True)
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
 
 def _request(host, path, api_key, url_params=None):
     url_params = url_params or {}
@@ -112,7 +112,6 @@ def chatbot():
     #TODO: Keeping track of user's content/response into messages
     # Create a list to store all the messages for context
     data, extra_info = get_restaurant_info()
-    dist = _get_distance(extra_info["coordinates"], coords)
     data_string = json.dumps(data)
     messages = [
             {"role": "user", "content": "Here is data about restaurants in JSON format. Use this data to answer my questions. " + data_string}, 
