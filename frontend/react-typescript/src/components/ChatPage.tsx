@@ -6,7 +6,7 @@ import { getMessages, postChatMessage } from '../services/messages'
 export function ChatPage() {
   const [message, setMessage] = useState('')
   const [messages, setMessages] = useState<Message[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     async function fetchData() {
@@ -44,7 +44,9 @@ export function ChatPage() {
               text: message,
               sender: 'self',
             }
+            setLoading(true)
             const responseMsg = await postChatMessage(newMsg)
+            setLoading(false)
             setMessages([...messages, newMsg, responseMsg])
           }}
         >
