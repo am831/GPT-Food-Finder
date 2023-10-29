@@ -20,6 +20,7 @@ def load_env(file_path='.env'):
 load_env()
 yelp_api_key = os.environ.get("YELP_API")
 openai_api_key = os.environ.get("OPENAI_API")
+coords = "37.7749,-122.4194"
 openai.api_key = openai_api_key
 YELP_HOST = 'https://api.yelp.com'
 SEARCH_PATH = '/v3/businesses/search'
@@ -68,7 +69,6 @@ def get_by_id(business_id_or_alias):
 @app.route('/search')
 def get_restaurant_info():
     location = _get_user_location()
-    coords = "37.7749,-122.4194"
     latitude, longitude = coords.split(',')
     url_params = {
     'term': "food",
@@ -78,6 +78,7 @@ def get_restaurant_info():
     'radius': 25 
     }
     json_data = _request(YELP_HOST, SEARCH_PATH, yelp_api_key, url_params)
+    print(json_data)
     restaurants = json_data["businesses"]
     data = {} # name and cuisine type
     extra = {} # address and rating
@@ -88,10 +89,11 @@ def get_restaurant_info():
         categories = restaurant["categories"]
         category_aliases = [category["title"] for category in categories]
         id = restaurant["id"]
+        coords2 = restaurant["coordinates"]
         location = restaurant["location"]
         rating = restaurant["rating"]
         entry = {"name": name, "categories": category_aliases}
-        entry2 = {"location" : location, "rating" : rating}
+        entry2 = {"name": name, "location" : location, "rating" : rating, "coordinates" : coords2}
         data[id] = entry
         extra[id] = entry2
     data_json = json.dumps(data)
@@ -101,15 +103,20 @@ def get_restaurant_info():
 # def _add_role_n_message(role, message):
 #     messages.append({"role": role, "content": message})
 
+def _get_distance(rest_loc, user_loc):
+    # TODO call maps api to get distance
+    return 1
+
 @app.route('/chat')
 def chatbot():
     #TODO: Keeping track of user's content/response into messages
     # Create a list to store all the messages for context
     data, extra_info = get_restaurant_info()
+    dist = _get_distance(extra_info["coordinates"], coords)
     data_string = json.dumps(data)
-    print(data_string)
     messages = [
             {"role": "user", "content": "Here is data about restaurants in JSON format. Use this data to answer my questions. " + data_string}, 
+            {"role": "user", "content": "Here is extra info about restaurants in JSON format. Use this data to answer my questions. " + extra_info}, 
             {"role": "user", "content": "Show me restaurant with ice cream"}
             ]
     response = openai.ChatCompletion.create(
@@ -119,8 +126,16 @@ def chatbot():
     )
     chat_message = response['choices'][0]['message']['content']
     print(f"Bot: {chat_message}")
-    messages.append({"role": "user", "content": chat_message})
-    return chat_message
+    messages.append({"role": "assistant", "content": chat_message})
+    messages.append({"role": "user", "content": "What is the full address of the restaurant?"})
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo-0613",
+        messages=messages,
+        # max_tokens = 1024, # this is the maximum number of tokens that can be used to provide a response.
+    )
+    chat_message = response['choices'][0]['message']['content']
+    messages.append({"role": "assistant", "content": chat_message})
+    return messages[2:]
 
 if __name__ == '__main__':
     app.run(debug=True)
