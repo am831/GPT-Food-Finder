@@ -92,7 +92,8 @@ def get_restaurant_info(latitude, longitude):
 
 @app.get("/", response_class=HTMLResponse)
 async def render_html(request: Request):
-    return templates.TemplateResponse("index.html")
+    template_data = {"title": "My FastAPI Page", "content": "This is a FastAPI-rendered HTML page."}
+    return templates.TemplateResponse("index.html", {"request": request, "context": template_data})
 
 @app.post("/location")
 def init(location: Location):
